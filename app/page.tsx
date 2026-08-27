@@ -1,5 +1,5 @@
 import ProjectCard from "@/components/ProjectCard";
-import { SAMPLE_PROJECTS } from "@/components/ProjectDetails";
+import { SAMPLE_PROJECTS } from "@/components/projectData";
 import { Terminal, Database, Server, Compass, Layout } from "lucide-react";
 
 export default function Home() {

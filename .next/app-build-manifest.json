@@ -16,11 +16,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/@modal/default.js"
     ],
-    "/@modal/[...catchAll]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/@modal/[...catchAll]/page.js"
-    ],
     "/@modal/(.)projects/[slug]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
