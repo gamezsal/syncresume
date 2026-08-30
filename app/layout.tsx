@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ChatDrawer from "@/components/chat/ChatDrawer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -35,6 +36,7 @@ export default function RootLayout({
         </main>
         
         {modal}
+        <ChatDrawer />
       </body>
     </html>
   );

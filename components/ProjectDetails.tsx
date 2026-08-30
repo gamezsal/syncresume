@@ -1,8 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Terminal, Star, GitCommit, Shield, Zap, Folder, File, ChevronRight, ChevronDown, BookOpen, Layers, Clock, ExternalLink } from "lucide-react";
-import { SAMPLE_PROJECTS, ProjectData } from "./projectData";
+import { 
+  Terminal, 
+  Star, 
+  GitCommit, 
+  Shield, 
+  Zap, 
+  Folder, 
+  File, 
+  ChevronRight, 
+  ChevronDown, 
+  BookOpen, 
+  Layers, 
+  Clock, 
+  ExternalLink 
+} from "lucide-react";
+import { SAMPLE_PROJECTS } from "@/lib/projectData";
 
 interface FileNode {
   name: string;
@@ -35,9 +49,8 @@ interface LiveSyncPayload {
   synchronizedAt: string;
 }
 
-// Nested Interactive File Tree Node Component
 function FileTreeNodeComponent({ node, depth = 0 }: { node: FileNode; depth: number }) {
-  const [isOpen, setIsOpen] = useState(depth === 0); // Open root level by default
+  const [isOpen, setIsOpen] = useState(depth === 0);
   const isDirectory = node.type === "tree";
 
   const toggleOpen = () => {
@@ -72,7 +85,7 @@ function FileTreeNodeComponent({ node, depth = 0 }: { node: FileNode; depth: num
             </>
           ) : (
             <>
-              <span className="w-3.5 shrink-0" /> {/* indent match for chevrons */}
+              <span className="w-3.5 shrink-0" />
               <File className="h-4 w-4 text-zinc-500 shrink-0" />
             </>
           )}
@@ -97,27 +110,30 @@ export default function ProjectDetails({ slug }: { slug: string }) {
   const staticProject = SAMPLE_PROJECTS[slug];
   const [activeTab, setActiveTab] = useState<"specs" | "readme" | "files" | "commits">("specs");
   const [liveData, setLiveData] = useState<LiveSyncPayload | null>(null);
-  const [isLoading, setIsLoading] = useState(slug === "syncresume-core");
+  const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    if (slug !== "syncresume-core") {
-      setLiveData(null);
+    if (!staticProject) {
       setIsLoading(false);
       return;
     }
+
+    const repoOwner = "gamezsal";
+    const repoName = staticProject.repoName || "syncresume";
 
     let isMounted = true;
     setIsLoading(true);
     setHasError(false);
 
-    fetch("/api/github/sync?owner=gamezsal&repo=syncresume")
+    // Fetch live telemetry on modal open
+    fetch(`/api/github/sync?owner=${repoOwner}&repo=${repoName}`)
       .then((res) => {
         if (!res.ok) throw new Error("API Route responded with failure");
         return res.json();
       })
       .then((data) => {
-        if (isMounted) {
+        if (isMounted && data?.data) {
           setLiveData(data.data);
           setIsLoading(false);
         }
@@ -133,7 +149,7 @@ export default function ProjectDetails({ slug }: { slug: string }) {
     return () => {
       isMounted = false;
     };
-  }, [slug]);
+  }, [slug, staticProject]);
 
   if (!staticProject) {
     return (
@@ -145,13 +161,13 @@ export default function ProjectDetails({ slug }: { slug: string }) {
     );
   }
 
-  // Combine live telemetry with static info if active and available
+  // Calculate live commit and star counts dynamically
   const displayStars = liveData?.metadata?.stars ?? staticProject.stars;
   const displayCommits = liveData?.commits ? liveData.commits.length : staticProject.commits;
 
   return (
     <div className="space-y-6">
-      {/* Dynamic Header */}
+      {/* Dynamic Header displaying live commits */}
       <div className="flex flex-col gap-4 border-b border-zinc-800 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <span className="font-mono text-xs tracking-wider text-teal-400 uppercase">System Module</span>
@@ -164,112 +180,73 @@ export default function ProjectDetails({ slug }: { slug: string }) {
           </div>
           <div className="flex items-center gap-1.5 rounded-md bg-zinc-850 border border-zinc-800 px-3 py-1.5 text-sm font-medium">
             <GitCommit className="h-4 w-4 text-emerald-500 shrink-0" />
-            <span className="font-mono">{displayCommits} Commits</span>
+            <span className="font-mono text-emerald-400">{displayCommits} Commits</span>
           </div>
         </div>
       </div>
 
-      {/* Tabs Menu (Only active for projects that support synchronization) */}
-      {slug === "syncresume-core" && (
-        <div className="flex border-b border-zinc-800 overflow-x-auto gap-2 p-1 bg-zinc-950/40 rounded-lg max-w-max">
-          <button
-            onClick={() => setActiveTab("specs")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md font-mono transition-all ${
-              activeTab === "specs"
-                ? "bg-zinc-850 text-white border border-zinc-750 font-bold"
-                : "text-zinc-400 hover:text-white"
-            }`}
-          >
-            <Zap className="h-3.5 w-3.5 shrink-0" />
-            Telemetry
-          </button>
-          <button
-            onClick={() => setActiveTab("readme")}
-            disabled={isLoading || hasError}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md font-mono transition-all ${
-              activeTab === "readme"
-                ? "bg-zinc-850 text-white border border-zinc-750 font-bold"
-                : "text-zinc-400 hover:text-white disabled:opacity-50"
-            }`}
-          >
-            <BookOpen className="h-3.5 w-3.5 shrink-0" />
-            README.md
-          </button>
-          <button
-            onClick={() => setActiveTab("files")}
-            disabled={isLoading || hasError}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md font-mono transition-all ${
-              activeTab === "files"
-                ? "bg-zinc-850 text-white border border-zinc-750 font-bold"
-                : "text-zinc-400 hover:text-white disabled:opacity-50"
-            }`}
-          >
-            <Layers className="h-3.5 w-3.5 shrink-0" />
-            Folder Tree
-          </button>
-          <button
-            onClick={() => setActiveTab("commits")}
-            disabled={isLoading || hasError}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md font-mono transition-all ${
-              activeTab === "commits"
-                ? "bg-zinc-850 text-white border border-zinc-750 font-bold"
-                : "text-zinc-400 hover:text-white disabled:opacity-50"
-            }`}
-          >
-            <Clock className="h-3.5 w-3.5 shrink-0" />
-            Commit Logs
-          </button>
-        </div>
-      )}
+      {/* Tabs Menu */}
+      <div className="flex border-b border-zinc-800 overflow-x-auto gap-2 p-1 bg-zinc-950/40 rounded-lg max-w-max">
+        <button
+          onClick={() => setActiveTab("specs")}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md font-mono transition-all ${
+            activeTab === "specs"
+              ? "bg-zinc-850 text-white border border-zinc-750 font-bold"
+              : "text-zinc-400 hover:text-white"
+          }`}
+        >
+          <Zap className="h-3.5 w-3.5 shrink-0" />
+          Telemetry
+        </button>
+        <button
+          onClick={() => setActiveTab("readme")}
+          disabled={isLoading || hasError}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md font-mono transition-all ${
+            activeTab === "readme"
+              ? "bg-zinc-850 text-white border border-zinc-750 font-bold"
+              : "text-zinc-400 hover:text-white disabled:opacity-50"
+          }`}
+        >
+          <BookOpen className="h-3.5 w-3.5 shrink-0" />
+          README.md
+        </button>
+        <button
+          onClick={() => setActiveTab("files")}
+          disabled={isLoading || hasError}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md font-mono transition-all ${
+            activeTab === "files"
+              ? "bg-zinc-850 text-white border border-zinc-750 font-bold"
+              : "text-zinc-400 hover:text-white disabled:opacity-50"
+          }`}
+        >
+          <Layers className="h-3.5 w-3.5 shrink-0" />
+          Folder Tree
+        </button>
+        <button
+          onClick={() => setActiveTab("commits")}
+          disabled={isLoading || hasError}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md font-mono transition-all ${
+            activeTab === "commits"
+              ? "bg-zinc-850 text-white border border-zinc-750 font-bold"
+              : "text-zinc-400 hover:text-white disabled:opacity-50"
+          }`}
+        >
+          <Clock className="h-3.5 w-3.5 shrink-0" />
+          Commit Logs ({displayCommits})
+        </button>
+      </div>
 
-      {/* Main Panel Content Area */}
+      {/* Main Content Area */}
       {isLoading ? (
-        /* Loading Skeleton Panel */
         <div className="space-y-4 py-8 animate-pulse">
           <div className="h-4 bg-zinc-800 rounded-md w-1/4"></div>
           <div className="space-y-2">
             <div className="h-4 bg-zinc-800 rounded-md w-full"></div>
             <div className="h-4 bg-zinc-800 rounded-md w-5/6"></div>
-            <div className="h-4 bg-zinc-800 rounded-md w-4/5"></div>
           </div>
-          <div className="pt-6 grid grid-cols-3 gap-4">
-            <div className="h-10 bg-zinc-800 rounded-lg"></div>
-            <div className="h-10 bg-zinc-800 rounded-lg"></div>
-            <div className="h-10 bg-zinc-800 rounded-lg"></div>
-          </div>
-        </div>
-      ) : hasError ? (
-        /* Fallback Error Panel with Retry Option */
-        <div className="rounded-xl border border-red-900/30 bg-red-950/10 p-6 flex flex-col items-center text-center space-y-3">
-          <Terminal className="h-10 w-10 text-red-400" />
-          <h4 className="font-semibold text-white">Live Connection Terminated</h4>
-          <p className="text-zinc-400 text-xs max-w-md">
-            The API client was unable to sync telemetry data. Please verify your local GITHUB_TOKEN environment variable is active inside .env.local.
-          </p>
-          <button
-            onClick={() => {
-              setHasError(false);
-              setIsLoading(true);
-              fetch("/api/github/sync?owner=gamezsal&repo=syncresume")
-                .then((res) => res.json())
-                .then((data) => {
-                  setLiveData(data.data);
-                  setIsLoading(false);
-                })
-                .catch(() => {
-                  setHasError(true);
-                  setIsLoading(false);
-                });
-            }}
-            className="rounded bg-zinc-800 px-3.5 py-1.5 text-xs text-white hover:bg-zinc-700 font-mono transition-colors"
-          >
-            Reconnect Daemon
-          </button>
         </div>
       ) : (
-        /* Active Display Tabs */
         <div>
-          {/* Tab 1: Specs & Static Telemetry */}
           {activeTab === "specs" && (
             <div className="grid gap-6 md:grid-cols-3">
               <div className="md:col-span-2 space-y-6">
@@ -295,7 +272,6 @@ export default function ProjectDetails({ slug }: { slug: string }) {
                 </div>
               </div>
 
-              {/* Sidebar Metrics Widget */}
               <div className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4 space-y-4">
                 <h4 className="font-mono text-sm tracking-wider text-zinc-400 uppercase flex items-center gap-1.5">
                   <Zap className="h-4 w-4 text-teal-400" /> System Telemetry
@@ -304,7 +280,7 @@ export default function ProjectDetails({ slug }: { slug: string }) {
                   {staticProject.metrics.map((metric) => (
                     <div key={metric.label} className="py-2.5 flex justify-between text-xs">
                       <span className="text-zinc-500">{metric.label}</span>
-                      <span className="font-mono font-semibold text-teal-300"> {metric.value}</span>
+                      <span className="font-mono font-semibold text-teal-300">{metric.value}</span>
                     </div>
                   ))}
                   {liveData && (
@@ -334,7 +310,6 @@ export default function ProjectDetails({ slug }: { slug: string }) {
             </div>
           )}
 
-          {/* Tab 2: Compiled README Markdown */}
           {activeTab === "readme" && liveData && (
             <div className="rounded-xl border border-zinc-850 bg-zinc-950/40 p-5 sm:p-6 overflow-y-auto max-h-[50vh]">
               <div 
@@ -344,70 +319,35 @@ export default function ProjectDetails({ slug }: { slug: string }) {
             </div>
           )}
 
-          {/* Tab 3: Interactive File Directory Tree */}
           {activeTab === "files" && liveData && (
             <div className="rounded-xl border border-zinc-850 bg-zinc-950/40 p-4 overflow-y-auto max-h-[50vh] space-y-1">
-              <div className="flex items-center gap-2 border-b border-zinc-900 pb-2 mb-3 text-zinc-500">
-                <Folder className="h-4 w-4" />
-                <span className="font-mono text-xs uppercase tracking-wider">
-                  Repository Files (GraphQL Crawled Root)
-                </span>
-              </div>
-              {liveData.fileTree && liveData.fileTree.length > 0 ? (
-                liveData.fileTree.map((node, index) => (
-                  <FileTreeNodeComponent key={`${node.path}-${index}`} node={node} depth={0} />
-                ))
-              ) : (
-                <p className="text-zinc-500 text-xs font-mono py-4 text-center">Repository directory is empty.</p>
-              )}
+              {liveData.fileTree.map((node, index) => (
+                <FileTreeNodeComponent key={`${node.path}-${index}`} node={node} depth={0} />
+              ))}
             </div>
           )}
 
-          {/* Tab 4: Dynamic Commits Feed */}
           {activeTab === "commits" && liveData && (
-            <div className="rounded-xl border border-zinc-850 bg-zinc-950/40 p-4 overflow-y-auto max-h-[50vh]">
-              <div className="flex items-center gap-2 border-b border-zinc-900 pb-2 mb-4 text-zinc-500">
-                <GitCommit className="h-4 w-4" />
-                <span className="font-mono text-xs uppercase tracking-wider">
-                  Active Developer Contribution Logs
-                </span>
-              </div>
-              
-              <div className="space-y-4 pl-2 relative before:absolute before:left-6 before:top-4 before:bottom-4 before:w-[1px] before:bg-zinc-850">
-                {liveData.commits && liveData.commits.length > 0 ? (
-                  liveData.commits.map((commit, index) => (
-                    <div key={commit.sha} className="flex gap-4 items-start relative">
-                      {/* Avatar or Circle */}
-                      <img 
-                        src={commit.author.avatarUrl || `https://github.com/${commit.author.login}.png`}
-                        alt={commit.author.login}
-                        onError={(e) => {
-                          // Fallback to stylized circle if avatar load fails
-                          (e.target as HTMLElement).style.display = "none";
-                        }}
-                        className="w-8 h-8 rounded-full border border-zinc-800 relative z-10 shrink-0 bg-zinc-900"
-                      />
-                      
-                      <div className="space-y-1 min-w-0 flex-1">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                          <span className="font-mono text-xs font-bold text-zinc-300">{commit.author.name}</span>
-                          <span className="text-[10px] text-zinc-500">
-                            {new Date(commit.date).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-sm text-zinc-400 break-words">{commit.message}</p>
-                        <div className="pt-1">
-                          <span className="inline-flex items-center gap-1 font-mono text-[10px] text-teal-400 rounded bg-teal-950/20 border border-teal-900/50 px-1.5 py-0.5">
-                            SHA: {commit.sha}
-                          </span>
-                        </div>
+            <div className="rounded-xl border border-zinc-850 bg-zinc-950/40 p-4 overflow-y-auto max-h-[50vh] space-y-3">
+              {liveData.commits && liveData.commits.length > 0 ? (
+                liveData.commits.map((commit) => (
+                  <div key={commit.sha} className="flex items-start justify-between p-3 rounded bg-zinc-900/40 border border-zinc-850 text-xs">
+                    <div className="space-y-1">
+                      <p className="text-zinc-200 font-medium">{commit.message}</p>
+                      <div className="flex items-center gap-2 text-[10px] text-zinc-500">
+                        <span>{commit.author.name}</span>
+                        <span>•</span>
+                        <span>{new Date(commit.date).toLocaleDateString()}</span>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-zinc-500 text-xs font-mono py-4 text-center">No commits indexed.</p>
-                )}
-              </div>
+                    <span className="font-mono text-[11px] text-teal-400 bg-teal-950/30 px-2 py-0.5 rounded border border-teal-900/50">
+                      {commit.sha}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-zinc-500 text-xs font-mono py-4 text-center">No commits indexed.</p>
+              )}
             </div>
           )}
         </div>

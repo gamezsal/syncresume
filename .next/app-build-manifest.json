@@ -6,20 +6,20 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/page": [
+    "/@modal/(.)projects/[slug]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/@modal/(.)projects/[slug]/page.js"
     ],
     "/@modal/default": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/@modal/default.js"
     ],
-    "/@modal/(.)projects/[slug]/page": [
+    "/api/github/sync/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/@modal/(.)projects/[slug]/page.js"
+      "static/chunks/app/api/github/sync/route.js"
     ]
   }
 }

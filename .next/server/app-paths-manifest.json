@@ -1,4 +1,4 @@
 {
-  "/@modal/(.)projects/[slug]/page": "app/@modal/(.)projects/[slug]/page.js",
-  "/page": "app/page.js"
+  "/api/github/sync/route": "app/api/github/sync/route.js",
+  "/@modal/(.)projects/[slug]/page": "app/@modal/(.)projects/[slug]/page.js"
 }

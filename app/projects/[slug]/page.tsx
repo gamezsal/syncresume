@@ -1,24 +1,43 @@
-import Link from "next/link";
-import ProjectDetails from "@/components/ProjectDetails";
-import { ArrowLeft } from "lucide-react";
+import { SAMPLE_PROJECTS } from "@/lib/data/projectData";
+import ProjectCard from "@/components/ProjectCard";
 
-export default async function StandaloneProjectPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
+export default function HomePage() {
+  const projects = Object.values(SAMPLE_PROJECTS);
+
   return (
-    <div className="min-h-screen pt-4 pb-16 space-y-6">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" /> Back to Dashboard
-      </Link>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 sm:p-10 backdrop-blur-sm">
-        <ProjectDetails slug={slug} />
+    <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      {/* Header Banner */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold text-slate-100 tracking-tight">
+          Engineering Portfolio & System Architecture
+        </h1>
+        <p className="text-sm text-zinc-400 max-w-2xl">
+          Production-grade AI agents, cloud pipelines, and system architectures. Click any card to inspect live GitHub file trees, commit histories, and benchmarks.
+        </p>
       </div>
-    </div>
+
+      {/* Asymmetric Bento Grid Container */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {projects.map((project, index) => {
+          // Give flagship projects 2-column span for hero hierarchy
+          const isHero = project.slug === "syncresume-core" || project.slug === "dealership-adk-pipelines";
+          
+          return (
+            <div
+              key={project.slug}
+              className={isHero ? "md:col-span-2 lg:col-span-2" : "md:col-span-1 lg:col-span-1"}
+            >
+              <ProjectCard
+                slug={project.slug}
+                title={project.title}
+                description={project.description}
+                stars={project.stars}
+                techCount={project.technologies.length}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </main>
   );
 }
