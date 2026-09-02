@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { auth, loginWithGoogle, logoutAdmin, hasFirebaseKeys } from "@/lib/firebase/client";
 import { onAuthStateChanged, User } from "firebase/auth";
-import ResumeDiffView from "@/components/admin/ResumeDiffView";
+import ResumeDiffView from "@/components/admin/ResumeDiffView_old";
 import { Upload, Loader2, RefreshCw, LogIn, LogOut, ShieldAlert, AlertTriangle } from "lucide-react";
 
 const AUTHORIZED_EMAILS = [
@@ -77,36 +77,37 @@ export default function AdminPage() {
     }
   };
 
-  const handleUploadAndParse = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file || !user) return;
+const handleUploadAndParse = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!file || !user) return;
 
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
+  setIsUploading(true);
+  const formData = new FormData();
+  formData.append("file", file); // Key matches backend perfectly!
 
-    try {
-      const idToken = await user.getIdToken();
-      const res = await fetch("/api/admin/resume/parse", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: formData,
-      });
+  try {
+    const idToken = await user.getIdToken();
+    const res = await fetch("/api/admin/resume/parse", {
+      method: "POST",
+      headers: {
+        // 👇 Changed from 'Authorization' to bypass Google's Cloud Shell Proxy block!
+        "X-Firebase-Auth": `Bearer ${idToken}`,
+      },
+      body: formData,
+    });
 
-      const data = await res.json();
-      if (res.ok) {
-        setStagedDraft(data.data);
-      } else {
-        alert(`Error: ${data.error}`);
-      }
-    } catch (err: any) {
-      alert(`Upload failed: ${err.message}`);
-    } finally {
-      setIsUploading(false);
+    const data = await res.json();
+    if (res.ok) {
+      setStagedDraft(data.data);
+    } else {
+      alert(`Error: ${data.error}`);
     }
-  };
+  } catch (err: any) {
+    alert(`Upload failed: ${err.message}`);
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   // ⚠️ Missing Environment Variables Warning
   if (!hasFirebaseKeys) {
