@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { auth, loginWithGoogle, logoutAdmin, hasFirebaseKeys } from "@/lib/firebase/client";
 import { onAuthStateChanged, User } from "firebase/auth";
-import ResumeDiffView from "@/components/admin/ResumeDiffView_old";
+import ResumeDiffView from "@/components/admin/ResumeDiffView";
+import { getFirestoreDb } from "@/lib/cache/firestore";
 import { Upload, Loader2, RefreshCw, LogIn, LogOut, ShieldAlert, AlertTriangle } from "lucide-react";
 
 const AUTHORIZED_EMAILS = [
@@ -83,7 +84,7 @@ const handleUploadAndParse = async (e: React.FormEvent) => {
 
   setIsUploading(true);
   const formData = new FormData();
-  formData.append("file", file); // Key matches backend perfectly!
+  formData.append("resume", file); // Key matches backend perfectly!
 
   try {
     const idToken = await user.getIdToken();
@@ -248,12 +249,12 @@ const handleUploadAndParse = async (e: React.FormEvent) => {
       </div>
 
       {/* Diff Review View */}
-      <ResumeDiffView
-        currentProfile={currentProfile}
-        stagedDraft={stagedDraft}
-        onApprovalSuccess={() => {
-          fetchState();
-        }}
+    <ResumeDiffView
+  currentProfile={currentProfile as any}
+  stagedDraft={stagedDraft as any}
+  onApprovalSuccess={() => {
+    fetchState();
+  }}
       />
     </div>
   );
