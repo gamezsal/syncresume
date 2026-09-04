@@ -1,4 +1,5 @@
 import ProjectCard from "@/components/ProjectCard";
+import PipelineTelemetryCard from "@/components/PipelineTelemetryCard";
 import { SAMPLE_PROJECTS } from "@/components/projectData";
 import { Terminal, Database, Server, Compass, Layout } from "lucide-react";
 
@@ -28,7 +29,7 @@ export default function Home() {
           <h2 className="text-lg font-mono font-semibold tracking-wider text-zinc-400 uppercase">System Modules Showcase</h2>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start">
           {/* Main Showcase Projects */}
           {projects.map((proj) => (
             <ProjectCard
@@ -41,26 +42,9 @@ export default function Home() {
             />
           ))}
 
-          {/* Interactive Staged Metrics Bento Grid Block */}
-          <div className="flex flex-col justify-between rounded-xl border border-zinc-900/40 bg-zinc-900/10 p-6 md:col-span-1 lg:col-span-1 border-dashed">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-zinc-500">
-                <Database className="h-4 w-4" />
-                <span className="font-mono text-xs uppercase tracking-wider">Storage Layer</span>
-              </div>
-              <h3 className="text-lg font-bold text-zinc-400">Manual Resume Staging</h3>
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                Resume parsing features are manually configured in Phase 1. Google Cloud Run triggers are pre-wired to extract PDF profiles using Gemini structured output arrays on upload.
-              </p>
-            </div>
-            <div className="mt-6 flex gap-2">
-              <span className="rounded bg-zinc-900 border border-zinc-800 px-2.5 py-1 text-xs text-zinc-500">
-                Staged
-              </span>
-              <span className="rounded bg-teal-950/20 border border-teal-900/50 px-2.5 py-1 text-xs text-teal-400 animate-pulse">
-                Ready to link
-              </span>
-            </div>
+          {/* Interactive Pipeline Telemetry Bento Card */}
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 flex justify-center">
+            <PipelineTelemetryCard />
           </div>
         </div>
       </div>
