@@ -22,15 +22,15 @@ export default function Home() {
         </p>
       </div>
 
-      {/* Bento Grid layout */}
+      {/* Bento Grid layout - Systems Modules Showcase */}
       <div className="space-y-6">
         <div className="flex items-center gap-2 border-b border-zinc-900 pb-3">
           <Layout className="h-5 w-5 text-teal-500" />
           <h2 className="text-lg font-mono font-semibold tracking-wider text-zinc-400 uppercase">System Modules Showcase</h2>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start">
-          {/* Main Showcase Projects */}
+        {/* Clean, balanced 3-column repository grid */}
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-stretch">
           {projects.map((proj) => (
             <ProjectCard
               key={proj.slug}
@@ -41,11 +41,17 @@ export default function Home() {
               techCount={proj.technologies.length}
             />
           ))}
+        </div>
+      </div>
 
-          {/* Interactive Pipeline Telemetry Bento Card */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-1 flex justify-center">
-            <PipelineTelemetryCard />
-          </div>
+      {/* Ingestion Engine Telemetry Console - Wide Horizontal Section */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 border-b border-zinc-900 pb-3">
+          <Server className="h-5 w-5 text-teal-500" />
+          <h2 className="text-lg font-mono font-semibold tracking-wider text-zinc-400 uppercase">Ingestion Engine Telemetry Console</h2>
+        </div>
+        <div className="w-full">
+          <PipelineTelemetryCard />
         </div>
       </div>
 
