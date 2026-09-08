@@ -228,7 +228,7 @@ export default function ProjectDetails({ slug }: { slug: string }) {
 
   // Combine live telemetry with static info if active and available
   const displayStars = liveData?.metadata?.stars ?? staticProject.stars;
-  const displayCommits = liveData?.commits ? liveData.commits.length : staticProject.commits;
+  const displayCommits = staticProject.commits;
 
   return (
     <div className="space-y-6 text-zinc-100">

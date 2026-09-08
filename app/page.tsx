@@ -39,6 +39,7 @@ export default function Home() {
               description={proj.description}
               stars={proj.stars}
               techCount={proj.technologies.length}
+              commits={proj.commits}
             />
           ))}
         </div>
