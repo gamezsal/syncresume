@@ -84,6 +84,8 @@ export async function setFirestoreCache<T>(
 ): Promise<void> {
   try {
     const db = getFirestoreDb();
+    if (!db) return; // Fail-safe check
+    
     const docRef = db.collection(collection).doc(docId);
     
     const cacheDoc: FirestoreCacheDocument<T> = {
@@ -93,11 +95,14 @@ export async function setFirestoreCache<T>(
       updatedAt: new Date().toISOString(),
     };
 
-    await docRef.set(cacheDoc, { merge: true });
+    // Recursively clean undefined values to satisfy Firestore's strict schema
+    const cleanDoc = sanitizeUndefined(cacheDoc);
+    await docRef.set(cleanDoc, { merge: true });
   } catch (error) {
     console.error(`[Firestore Cache] Set failed for ${collection}/${docId}:`, error);
   }
 }
+
 
 export async function deleteFirestoreCache(collection: string, docId: string): Promise<void> {
   try {
@@ -106,4 +111,26 @@ export async function deleteFirestoreCache(collection: string, docId: string): P
   } catch (error) {
     console.error(`[Firestore Cache] Delete failed for ${collection}/${docId}:`, error);
   }
+}
+
+// Helper to recursively strip undefined properties or convert them to null
+function sanitizeUndefined(obj: any): any {
+  if (obj === undefined) return null;
+  if (obj === null) return null;
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeUndefined);
+  }
+  if (typeof obj === "object") {
+    const sanitized: Record<string, any> = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const val = sanitizeUndefined(obj[key]);
+        if (val !== undefined) {
+          sanitized[key] = val;
+        }
+      }
+    }
+    return sanitized;
+  }
+  return obj;
 }
