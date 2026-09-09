@@ -42,6 +42,64 @@ export default function ChatDrawer() {
     }
   }, [messages, isOpen]);
 
+   const formatMessageContent = (text: string) => {
+    if (!text) return null;
+
+    // Normalize any literal "\n" or "\\n" text strings into real newline characters
+    const processedText = text.replaceAll("\\n", "\n");
+
+    const lines = processedText.split("\n");
+    return lines.map((line, lineIndex) => {
+      let cleanLine = line.trim();
+
+      // Render empty lines as paragraph spacing
+      if (!cleanLine) {
+        return <div key={lineIndex} className="h-2" />;
+      }
+
+      // Check if this line is a bullet item (* or •)
+      let isBullet = false;
+      if (cleanLine.startsWith("* ") || cleanLine.startsWith("• ")) {
+        isBullet = true;
+        cleanLine = cleanLine.substring(2);
+      } else if (cleanLine.startsWith("*") || cleanLine.startsWith("•")) {
+        isBullet = true;
+        cleanLine = cleanLine.substring(1);
+      }
+
+      // Parse bold markers (**text**)
+      const parts = cleanLine.split("**");
+      const formattedText = parts.map((part, partIndex) => {
+        // Odd indices are bolded
+        if (partIndex % 2 === 1) {
+          return (
+            <strong key={partIndex} className="font-extrabold text-cyan-300">
+              {part}
+            </strong>
+          );
+        }
+        return part;
+      });
+
+      if (isBullet) {
+        return (
+          <div key={lineIndex} className="flex items-start gap-2 my-1.5 pl-1.5">
+            <span className="text-cyan-400 select-none mt-1 shrink-0">•</span>
+            <span className="flex-1 text-slate-200 leading-relaxed text-sm">
+              {formattedText}
+            </span>
+          </div>
+        );
+      }
+
+      return (
+        <p key={lineIndex} className="mb-2 text-slate-200 leading-relaxed text-sm">
+          {formattedText}
+        </p>
+      );
+    });
+  };
+
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || input).trim();
     if (!query || isLoading) return;
@@ -168,7 +226,7 @@ export default function ChatDrawer() {
                 </button>
               </div>
 
-              {/* Message List */}
+                           {/* Message List */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map((msg) => (
                   <div
@@ -187,14 +245,20 @@ export default function ChatDrawer() {
                       {msg.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                     </div>
 
+                    {/* 1. Added whitespace-pre-wrap below to preserve styled newline breaks */}
                     <div
-                      className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                      className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
                         msg.role === "user"
                           ? "bg-indigo-600 text-white rounded-tr-none"
                           : "bg-slate-900 border border-slate-800 text-slate-200 rounded-tl-none"
                       }`}
                     >
-                      {msg.content || (
+                      {/* 2. Custom conditional layout rendering */}
+                      {msg.role === "user" ? (
+                        <p>{msg.content}</p>
+                      ) : msg.content ? (
+                        formatMessageContent(msg.content) // 👈 3. Formats response markdown and replaces literal \n strings
+                      ) : (
                         <span className="flex items-center gap-1.5 text-slate-400">
                           <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
                           Thinking...

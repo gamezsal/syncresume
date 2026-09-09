@@ -1,5 +1,6 @@
 "use client";
 
+import DOMPurify from "isomorphic-dompurify";
 import { useState, useEffect } from "react";
 import { Terminal, Star, GitCommit, Shield, Zap, Folder, File, ChevronRight, ChevronDown, BookOpen, Layers, Clock, ExternalLink } from "lucide-react";
 import { SAMPLE_PROJECTS, ProjectData } from "./projectData";
@@ -422,7 +423,7 @@ export default function ProjectDetails({ slug }: { slug: string }) {
             <div className="rounded-xl border border-zinc-850 bg-zinc-950/40 p-5 sm:p-6 overflow-y-auto max-h-[50vh]">
               <div 
                 className="markdown-body text-zinc-300 leading-relaxed text-sm"
-                dangerouslySetInnerHTML={{ __html: liveData.readmeHtml }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(liveData.readmeHtml) }}
               />
             </div>
           )}
