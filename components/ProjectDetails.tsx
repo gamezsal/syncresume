@@ -400,9 +400,9 @@ export default function ProjectDetails({ slug }: { slug: string }) {
                     </div>
                   )}
                 </div>
-                {liveData?.metadata?.url && (
+               {staticProject.githubRepo && (
                   <a
-                    href={liveData.metadata.url}
+                    href={`https://github.com/${staticProject.githubOwner || "gamezsal"}/${staticProject.githubRepo}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-1.5 w-full text-center py-2 rounded bg-zinc-850 hover:bg-zinc-800 text-xs font-semibold text-white transition-all border border-zinc-800 hover:border-zinc-700"
