@@ -21,19 +21,32 @@ export default function AdminPage() {
   const [stagedDraft, setStagedDraft] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
+    useEffect(() => {
     if (!hasFirebaseKeys || !auth) {
       setAuthLoading(false);
       return;
     }
 
+    let timer: ReturnType<typeof setTimeout>;
+
     const unsubscribe = onAuthStateChanged(
       auth,
-      (currentUser) => {
+      async (currentUser) => {
         setUser(currentUser);
         setAuthLoading(false);
+
         if (currentUser) {
+          try {
+            // 🔑 Sync Firebase ID Token to __session cookie for protected API calls
+            const idToken = await currentUser.getIdToken();
+            document.cookie = `__session=${idToken}; path=/; max-age=3600; SameSite=Lax; Secure`;
+          } catch (tokenErr) {
+            console.error("Failed to fetch ID token:", tokenErr);
+          }
           fetchState();
+        } else {
+          // Clear session cookie when logged out
+          document.cookie = "__session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
         }
       },
       (err) => {
@@ -43,13 +56,9 @@ export default function AdminPage() {
       }
     );
 
-    const timer = setTimeout(() => {
-      setAuthLoading(false);
-    }, 3000);
-
     return () => {
-      unsubscribe();
-      clearTimeout(timer);
+      if (unsubscribe) unsubscribe();
+      if (timer) clearTimeout(timer);
     };
   }, []);
 
