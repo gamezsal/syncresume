@@ -1,4 +1,6 @@
 {
-  "/api/github/sync/route": "app/api/github/sync/route.js",
-  "/@modal/(.)projects/[slug]/page": "app/@modal/(.)projects/[slug]/page.js"
+  "/api/admin/resume/status/route": "app/api/admin/resume/status/route.js",
+  "/api/admin/resume/approve/route": "app/api/admin/resume/approve/route.js",
+  "/admin/page": "app/admin/page.js",
+  "/page": "app/page.js"
 }

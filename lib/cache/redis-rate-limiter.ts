@@ -1,4 +1,4 @@
-import { getRedisClient } from "./redis";
+import { getRedisInstance } from "./redis";
 
 // Atomic server-side Lua script for Sliding Window Log Rate Limiting
 const LUA_SLIDING_WINDOW = `
@@ -53,7 +53,7 @@ export async function isRateLimited(
   limit: number = 10,
   windowSeconds: number = 60
 ): Promise<RateLimitResult> {
-  const client = getRedisClient();
+  const client = getRedisInstance();
 
   // If Redis is offline, fail-open to preserve client availability
   if (!client) {

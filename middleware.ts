@@ -2,21 +2,19 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * middleware.ts (v2)
- * Next.js Edge Middleware for Admin API Protection & Security Hardening.
+ * middleware.ts (v2 - Hardened Wildcard Protection)
+ * Next.js Edge Middleware for Admin & Resume API Security.
  *
- * Tailored for unified app/admin/page.tsx:
- * Allows the /admin page to load so the Google Login UI can render,
- * while strictly enforcing Edge token verification on backend API endpoints
- * (/api/resume/upload and /api/admin/*) to block unauthenticated requests.
+ * Enforces Edge token verification across all /api/resume/* sub-routes
+ * (/parse, /approve, /status) and /api/admin/* to block unauthenticated requests.
  */
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Strictly protect backend administrative & ingestion API routes
+  // 1. Strictly protect all resume ingestion & administrative API routes
   if (
-    pathname.startsWith("/api/resume/upload") ||
+    pathname.startsWith("/api/resume") ||
     pathname.startsWith("/api/admin")
   ) {
     const sessionCookie =
@@ -72,12 +70,12 @@ export function middleware(request: NextRequest) {
 }
 
 /**
- * Configure Matcher to intercept administrative paths and upload APIs
+ * Configure Matcher to intercept administrative paths and all resume APIs
  */
 export const config = {
   matcher: [
     "/admin/:path*",
     "/api/admin/:path*",
-    "/api/resume/upload",
+    "/api/resume/:path*", // 👈 Wildcard covers /parse, /approve, /status, etc.
   ],
 };

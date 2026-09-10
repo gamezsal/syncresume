@@ -7,6 +7,15 @@ export const redis = new Redis(redisUrl, {
   lazyConnect: true,
 });
 
+// 🔑 Helper function exports expected by redis-rate-limiter.ts
+export function getRedisInstance(): Redis {
+  return redis;
+}
+
+export function getRedisClient(): Redis {
+  return redis;
+}
+
 export async function getCachedData<T>(key: string): Promise<T | null> {
   try {
     const data = await redis.get(key);
