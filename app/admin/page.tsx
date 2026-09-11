@@ -268,3 +268,5 @@ const handleUploadAndParse = async (e: React.FormEvent) => {
     </div>
   );
 }
+
+export const dynamic = 'force-dynamic';
