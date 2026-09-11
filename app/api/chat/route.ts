@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Validate Incoming Request Body
+  // 2. Validate Incoming Request Body
     const { messages } = await req.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -35,6 +35,10 @@ export async function POST(req: NextRequest) {
     }
 
     const latestUserMessage = messages[messages.length - 1].content;
+
+    // 🧹 Ensure conversation payload starts with a 'user' role (skips UI welcome message)
+    const firstUserIdx = messages.findIndex((m: any) => m.role === "user");
+    const activeMessages = firstUserIdx !== -1 ? messages.slice(firstUserIdx) : messages;
 
     // 🛡️ 3. Model Armor Active Security Check
     const armorCheck = await sanitizeInputWithModelArmor(latestUserMessage);
@@ -105,10 +109,10 @@ ${contextText}
 -----------------------------------
 `;
 
-    // 6. Stream Response Chunks via Gemini API (gemini-3.6-flash)
+  // 6. Stream Response Chunks via Gemini API (gemini-2.5-flash)
     const responseStream = await ai.models.generateContentStream({
       model: "gemini-2.5-flash",
-      contents: messages.map((msg: any) => ({
+      contents: activeMessages.map((msg: any) => ({
         role: msg.role === "assistant" ? "model" : "user",
         parts: [{ text: msg.content }],
       })),
