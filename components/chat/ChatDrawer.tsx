@@ -131,9 +131,12 @@ export default function ChatDrawer() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Chat API error: ${response.statusText}`);
-      }
+if (!response.ok) {
+  const errorData = await response.json().catch(() => ({}));
+  const errorMessage =
+    errorData.message || errorData.error || `Chat API error (${response.status})`;
+  throw new Error(errorMessage);
+}
 
       if (!response.body) {
         throw new Error("No response stream body available.");

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { retrieveRelevantContext } from "@/lib/ai/rag";
+import { isRateLimited } from "@/lib/cache/redis-rate-limiter";
+import { sanitizeInputWithModelArmor } from "@/lib/security/model-armor";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY || "",
@@ -8,6 +10,21 @@ const ai = new GoogleGenAI({
 
 export async function POST(req: NextRequest) {
   try {
+    // 🛡️ 1. Rate Limit Check (Runs first to save quota & stop spam)
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
+    const rateCheck = await isRateLimited(ip, 10, 60);
+
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        {
+          error: "Too Many Requests",
+          message: `Rate limit exceeded. Please try again in ${rateCheck.reset} seconds.`,
+        },
+        { status: 429 }
+      );
+    }
+
+    // 2. Validate Incoming Request Body
     const { messages } = await req.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -19,10 +36,23 @@ export async function POST(req: NextRequest) {
 
     const latestUserMessage = messages[messages.length - 1].content;
 
-    // 1. Vector Search: Retrieve top 3 relevant context chunks from Firestore
+    // 🛡️ 3. Model Armor Active Security Check
+    const armorCheck = await sanitizeInputWithModelArmor(latestUserMessage);
+    if (!armorCheck.isSafe) {
+      return NextResponse.json(
+        {
+          error: "Security Violation",
+          message: "Prompt injection or jailbreak pattern detected.",
+          violations: armorCheck.violations,
+        },
+        { status: 400 }
+      );
+    }
+
+    // 4. Vector Search: Retrieve top 3 relevant context chunks from Firestore
     const relevantChunks = await retrieveRelevantContext(latestUserMessage, 3);
 
-    // 2. Build Guardrailed System Prompt with layout specifications
+    // 5. Build Guardrailed System Prompt with layout specifications
     let contextText = "";
     if (relevantChunks.length > 0) {
       contextText = relevantChunks
@@ -75,7 +105,7 @@ ${contextText}
 -----------------------------------
 `;
 
-    // 3. Stream Response Chunks via Gemini API (gemini-3.6-flash)
+    // 6. Stream Response Chunks via Gemini API (gemini-3.6-flash)
     const responseStream = await ai.models.generateContentStream({
       model: "gemini-3.6-flash",
       contents: messages.map((msg: any) => ({
@@ -88,7 +118,7 @@ ${contextText}
       },
     });
 
-    // 4. Convert to Web ReadableStream for Frontend Consumption
+    // 7. Convert to Web ReadableStream for Frontend Consumption
     const encoder = new TextEncoder();
     const readableStream = new ReadableStream({
       async start(controller) {
