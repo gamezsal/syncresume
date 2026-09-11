@@ -27,12 +27,15 @@ export function middleware(request: NextRequest) {
       Boolean(sessionCookie) ||
       Boolean(authHeader && authHeader.startsWith("Bearer "));
 
-    if (!isAuthenticated) {
-      console.warn(
-        `[Edge Middleware] Blocked unauthenticated API call to '${pathname}' from IP: ${
-          request.ip || "unknown"
-        }`
-      );
+   const clientIp =
+  request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+  request.headers.get("x-real-ip") ||
+  "unknown";
+
+if (!isAuthenticated) {
+  console.warn(
+    `[Edge Middleware] Blocked unauthenticated API call to '${pathname}' from IP: ${clientIp}`
+  );
 
       return NextResponse.json(
         {

@@ -27,7 +27,7 @@ export default function AdminPage() {
       return;
     }
 
-    let timer: ReturnType<typeof setTimeout>;
+    let timer: ReturnType<typeof setTimeout> | undefined = undefined;
 
     const unsubscribe = onAuthStateChanged(
       auth,

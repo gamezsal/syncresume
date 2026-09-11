@@ -4,11 +4,12 @@ import { z } from "zod";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestoreDb } from "@/lib/cache/firestore";
 import { isRateLimited } from "@/lib/cache/redis-rate-limiter";
+import { sanitizeInputWithModelArmor } from "@/lib/security/model-armor";
 
 /**
  * Zod Schema for strict Resume Ingestion and JSON validation.
  */
-export const ResumeDataSchema = z.object({
+const ResumeDataSchema = z.object({
   header: z.object({
     name: z.string().describe("The candidate's full name"),
     shortAbout: z.string().describe("A brief, one-sentence elevator pitch"),
@@ -160,8 +161,8 @@ export async function POST(request: NextRequest) {
     // 🛡️ GUARDRAIL 3: Redis Sliding-Window Rate Limiter (5 req/hr per IP)
     // -------------------------------------------------------------------
     const clientIp =
-      request.ip ||
       request.headers.get("x-forwarded-for")?.split(",")?.[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
       "127.0.0.1";
 
     const rateCheck = await isRateLimited(`resume_parse:${clientIp}`, 5, 3600);
@@ -228,8 +229,21 @@ export async function POST(request: NextRequest) {
         { status: 415 }
       );
     }
-
     const pdfBase64 = pdfBuffer.toString("base64");
+
+   // 🛡️ Model Armor Active Security Firewall Check
+    const armorCheck = await sanitizeInputWithModelArmor(pdfBuffer.toString("utf-8"));
+    if (!armorCheck.isSafe) {
+      console.warn(`[Model Armor Block] Intercepted: ${armorCheck.violations.join(", ")}`);
+      return NextResponse.json(
+        {
+          error: "Security Violation",
+          message: "Uploaded document contains prohibited prompt injection patterns.",
+          violations: armorCheck.violations,
+        },
+        { status: 400 }
+      );
+    }  
 
     // -------------------------------------------------------------------
     // 🚀 YOUR EXISTING GEMINI PARSER DISPATCH
