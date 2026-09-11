@@ -107,7 +107,7 @@ ${contextText}
 
     // 6. Stream Response Chunks via Gemini API (gemini-3.6-flash)
     const responseStream = await ai.models.generateContentStream({
-      model: "gemini-3.6-flash",
+      model: "gemini-2.5-flash",
       contents: messages.map((msg: any) => ({
         role: msg.role === "assistant" ? "model" : "user",
         parts: [{ text: msg.content }],
