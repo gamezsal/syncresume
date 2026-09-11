@@ -4,3 +4,10 @@ runConfig:
   concurrency: 80
   cpu: 1
   memoryMiB: 512
+
+
+env:
+  - variable: GEMINI_API_KEY
+    secret: GEMINI_API_KEY
+  - variable: GITHUB_TOKEN
+    secret: GITHUB_TOKEN
