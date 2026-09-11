@@ -24,15 +24,10 @@ env:
     value: "syncresume-e2d3d.firebasestorage.app"
 
   - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-    value: "200229110740" # Your real Sender ID string from Firebase Console [6]
+    value: "200229110740" 
 
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    value: "1:200229110740:web:c1bdfb6857aba61ade4c41" # Your real Web App ID from Firebase Console [6]
-
-  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-    value: "syncresume-e2d3d.firebasestorage.ap"
-
-
+    value: "1:200229110740:web:c1bdfb6857aba61ade4c41" 
 
   # --------------------------------------------------------------------------
   # B. Server-Side Backend Secrets (Cloud Secret Manager References) [2, 7, 8]
