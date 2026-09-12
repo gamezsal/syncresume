@@ -3,8 +3,31 @@ import ChatDrawer from "@/components/chat/ChatDrawer";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://syncresume-e2d3d.us-central1.hosted.app"),
   title: "syncresume | Multimodal Portfolio & Engineering Hub",
   description: "Real-time automated engineering portfolio synchronized with GitHub and verified by AI.",
+  openGraph: {
+    title: "syncresume | Multimodal Portfolio & Engineering Hub",
+    description: "Real-time automated engineering portfolio synchronized with GitHub and verified by AI.",
+    url: "https://syncresume-e2d3d.us-central1.hosted.app",
+    siteName: "syncresume",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "syncresume — Multimodal Engineering Portfolio",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "syncresume | Multimodal Portfolio & Engineering Hub",
+    description: "Real-time automated engineering portfolio synchronized with GitHub and verified by AI.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
