@@ -117,9 +117,43 @@ export default function ResumeDiffView({
 
     try {
       console.log("[ResumeDiffView] Directing database merge and live synchronization...");
+
+      // 1. Retrieve auth token dynamically if Firebase Client Auth is initialized
+      let authToken = "";
+      try {
+        const { getAuth } = await import("firebase/auth");
+        const auth = getAuth();
+        if (auth.currentUser) {
+          authToken = await auth.currentUser.getIdToken();
+        }
+      } catch (authErr) {
+        // Firebase Client Auth SDK not initialized in this module scope
+      }
+
+      // 2. Fallback check for session cookies in document.cookie
+      if (!authToken && typeof document !== "undefined") {
+        const cookies = document.cookie.split(";").reduce((acc, cookie) => {
+          const [key, val] = cookie.trim().split("=");
+          if (key && val) acc[key] = val;
+          return acc;
+        }, {} as Record<string, string>);
+
+        authToken = cookies["__session"] || cookies["admin_session"] || "";
+      }
+
+      // 3. Construct headers with Authorization token if available
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (authToken) {
+        headers["Authorization"] = `Bearer ${authToken}`;
+      }
+
       const response = await fetch("/api/admin/resume/approve", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
+        credentials: "include", // Enforces sending __session / admin_session cookies across Edge CDN
         body: JSON.stringify({ payload: stagedDraft }),
       });
 
@@ -501,7 +535,6 @@ export default function ResumeDiffView({
           {activeTab === "experience" && (
             <div className="space-y-4 min-h-[300px]">
               {draftWork.map((job, i) => {
-                // Highlight comparison
                 const currentMatch = currentWork.find(w => w.company.toLowerCase() === job.company.toLowerCase());
                 const isNew = !currentMatch;
                 const isDiff = currentMatch && (currentMatch.title !== job.title || currentMatch.description !== job.description);
