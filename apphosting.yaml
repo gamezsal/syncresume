@@ -5,7 +5,7 @@ runConfig:
   cpu: 1
   memoryMiB: 512
   vpcAccess: 
-      egress: ALL_TRAFFIC 
+      egress: PRIVATE_RANGES_ONLY
       connector: redis-connector  # or "projects/syncresume-e2d3d/locations/us-central1/connectors/redis-connector"
 
 
