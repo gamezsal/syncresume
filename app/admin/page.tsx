@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { auth, loginWithGoogle, logoutAdmin, hasFirebaseKeys } from "@/lib/firebase/client";
 import { onAuthStateChanged, User } from "firebase/auth";
-import ResumeDiffView from "@/components/admin/ResumeDiffView";
-import { getFirestoreDb } from "@/lib/cache/firestore";
+import ResumeDiffView from "@/components/admin/ResumeDiffView_old";
+import { getFirestoreDb } from "@/lib/cache/firestore_old";
 import { Upload, Loader2, RefreshCw, LogIn, LogOut, ShieldAlert, AlertTriangle } from "lucide-react";
 
 const AUTHORIZED_EMAILS = [
@@ -46,7 +46,7 @@ export default function AdminPage() {
           fetchState();
         } else {
           // Clear session cookie when logged out
-          document.cookie = "__session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+          document.cookie = "__session=; path=/; max-age=0; SameSite=Lax; Secure";
         }
       },
       (err) => {
