@@ -1,14 +1,18 @@
+# Firebase App Hosting configuration file for Next.js
+# Reference: https://firebase.google.com/docs/app-hosting/configure
+
+# Cloud Run backend service resources and scaling configurations
 runConfig:
-  minInstances: 1
-  maxInstances: 10
-  concurrency: 80
-  cpu: 1
-  memoryMiB: 512
-  vpcAccess: 
-      egress: PRIVATE_RANGES_ONLY
-      connector: redis-connector  # or "projects/syncresume-e2d3d/locations/us-central1/connectors/redis-connector"
+  minInstances: 1      # Guarantees an always-warm container instance to eliminate cold-starts
+  maxInstances: 10     # Establishes a budget ceiling to protect against billing spikes
+  concurrency: 80      # Maximum concurrent requests processed by a single server container
+  cpu: 1               # Dedicated compute vCPU allocation
+  memoryMiB: 512       # Dedicated container RAM bounds
+  vpcAccess:
+    connector: projects/syncresume-e2d3d/locations/us-central1/connectors/redis-connector
+    egress: PRIVATE_RANGES_ONLY
 
-
+# Server environment variables and Cloud Secret Manager bindings
 env:
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     value: "AIzaSyDTsgG9qmODcWIs614Z-z7PkiM67bL44GY"
@@ -37,7 +41,8 @@ env:
   - variable: FIREBASE_SERVICE_ACCOUNT_JSON
     secret: FIREBASE_SERVICE_ACCOUNT_JSON
 
-  - variable: REDIS_HOST 
-    value: "10.197.50.115" 
-  - variable: REDIS_PORT 
+  - variable: REDIS_HOST
+    value: "10.197.50.115"
+
+  - variable: REDIS_PORT
     value: "6379"
