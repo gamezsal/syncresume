@@ -1,7 +1,7 @@
 import ProjectCard from "@/components/ProjectCard";
 import PipelineTelemetryCard from "@/components/PipelineTelemetryCard";
 import { SAMPLE_PROJECTS } from "@/components/projectData";
-import { Terminal, Database, Server, Compass, Layout } from "lucide-react";
+import { Terminal, Server, Layout } from "lucide-react";
 
 export default function Home() {
   const projects = Object.values(SAMPLE_PROJECTS);
@@ -24,12 +24,17 @@ export default function Home() {
 
       {/* Bento Grid layout - Systems Modules Showcase */}
       <div className="space-y-6">
-        <div className="flex items-center gap-2 border-b border-zinc-900 pb-3">
-          <Layout className="h-5 w-5 text-teal-500" />
-          <h2 className="text-lg font-mono font-semibold tracking-wider text-zinc-400 uppercase">System Modules Showcase</h2>
+        <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
+          <div className="flex items-center gap-2">
+            <Layout className="h-5 w-5 text-teal-500" />
+            <h2 className="text-lg font-mono font-semibold tracking-wider text-zinc-400 uppercase">System Modules Showcase</h2>
+          </div>
+          <span className="text-xs font-mono text-teal-400 bg-teal-950/40 px-2.5 py-1 rounded-full border border-teal-500/20">
+            {projects.length} Active Modules
+          </span>
         </div>
 
-        {/* Clean, balanced 3-column repository grid */}
+        {/* Dynamic Bento Grid - Scales smoothly with 5 repository cards */}
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-stretch">
           {projects.map((proj) => (
             <ProjectCard
@@ -39,7 +44,6 @@ export default function Home() {
               description={proj.description}
               stars={proj.stars}
               techCount={proj.technologies.length}
-              commits={proj.commits}
             />
           ))}
         </div>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getFirestoreDb } from "@/lib/cache/firestore";
+import { getFirestoreDb } from "@/lib/cache/firestore_old";
 
 /**
  * Calculates the exact word count from a structured parsed resume payload.

@@ -1,0 +1,43 @@
+runConfig:
+  minInstances: 1
+  maxInstances: 10
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+  vpcAccess: 
+      egress: PRIVATE_RANGES_ONLY
+      connector: redis-connector  # or "projects/syncresume-e2d3d/locations/us-central1/connectors/redis-connector"
+
+
+env:
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: "AIzaSyDTsgG9qmODcWIs614Z-z7PkiM67bL44GY"
+
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: "syncresume-e2d3d"
+
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: "syncresume-e2d3d.firebaseapp.com"
+
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: "syncresume-e2d3d.firebasestorage.app"
+
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "200229110740"
+
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: "1:200229110740:web:c1bdfb6857aba61ade4c41"
+
+  - variable: GEMINI_API_KEY
+    secret: GEMINI_API_KEY
+
+  - variable: GITHUB_TOKEN
+    secret: GITHUB_TOKEN
+
+  - variable: FIREBASE_SERVICE_ACCOUNT_JSON
+    secret: FIREBASE_SERVICE_ACCOUNT_JSON
+
+  - variable: REDIS_HOST 
+    value: "10.197.50.115" 
+  - variable: REDIS_PORT 
+    value: "6379"

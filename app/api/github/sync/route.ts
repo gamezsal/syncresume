@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getCachedData, setCachedData } from "@/lib/cache/redis";
-import { getFirestoreCache, setFirestoreCache } from "@/lib/cache/firestore";
+import { getCachedData, setCachedData } from "@/lib/cache/redis_old";
+import { getFirestoreCache, setFirestoreCache } from "@/lib/cache/firestore_old";
 import { 
   getRepoMetadata, 
   getRepoFileTree, 

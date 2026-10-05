@@ -1,4 +1,4 @@
-import { getRedisInstance } from "./redis";
+import { getRedisInstance } from "./redis_old";
 
 // Atomic server-side Lua script for Sliding Window Log Rate Limiting
 const LUA_SLIDING_WINDOW = `

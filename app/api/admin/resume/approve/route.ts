@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFirestoreDb } from "@/lib/cache/firestore";
+import { getFirestoreDb } from "@/lib/cache/firestore_old";
 import { generateEmbedding } from "@/lib/ai/embeddings";
 import { FieldValue } from "firebase-admin/firestore";
 

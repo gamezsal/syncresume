@@ -89,5 +89,53 @@ export const SAMPLE_PROJECTS: Record<string, ProjectData> = {
     ],
     githubRepo: "adk-sf-workspace",
     githubOwner: "gamezsal"
+  },
+"industry-watch": {
+    slug: "industry-watch",
+    title: "industry_watch",
+    description: "Real-time industry surveillance and competitive intelligence pipeline processing news feeds, sentiment signals, and market trends.",
+    detailedDescription: "An automated market surveillance and competitive intelligence platform. Industry Watch ingests streaming industry news feeds, financial signals, and competitor data points, running sentiment extraction and NLP categorizations to deliver actionable real-time market intelligence dashboards.",
+    stars: 24,
+    commits: 42,
+    technologies: [
+      "Python",
+      "FastAPI",
+      "Real-Time NLP",
+      "Cloud Run",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    metrics: [
+      { label: "Feed Ingestion Rate", value: "500 msgs/sec" },
+      { label: "NLP Sentiment Precision", value: "92.4%" },
+      { label: "Pipeline Latency", value: "< 250ms" }
+    ],
+    githubRepo: "industry_watch",
+    githubOwner: "gamezsal"
+  },
+  "trailpulse": {
+    slug: "trailpulse",
+    title: "trailpulse",
+    description: "Outdoor trail condition monitoring and geospatial activity telemetry platform with live sensor sync and interactive mapping.",
+    detailedDescription: "A telemetry and geospatial analytics platform for outdoor enthusiasts and trail managers. TrailPulse processes GPS track logs, elevation profiles, weather telemetry, and crowd-sourced trail condition reports in real-time, providing interactive spatial mapping and route difficulty analytics.",
+    stars: 31,
+    commits: 68,
+    technologies: [
+      "Next.js App Router",
+      "PostGIS / PostgreSQL",
+      "Mapbox GL",
+      "Geospatial Indexing",
+      "TypeScript",
+      "Tailwind CSS"
+    ],
+    metrics: [
+      { label: "Geospatial Query Speed", value: "14ms" },
+      { label: "Live Telemetry Refresh", value: "Real-time" },
+      { label: "Map Rendering", value: "60 FPS" }
+    ],
+    githubRepo: "trailpulse",
+    githubOwner: "gamezsal"
   }
 };
+
+

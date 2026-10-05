@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { getAuth } from "firebase-admin/auth";
-import { getFirestoreDb } from "@/lib/cache/firestore";
+import { getFirestoreDb } from "@/lib/cache/firestore_old";
 import { isRateLimited } from "@/lib/cache/redis-rate-limiter";
 import { sanitizeInputWithModelArmor } from "@/lib/security/model-armor";
 

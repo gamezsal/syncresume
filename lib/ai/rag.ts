@@ -1,4 +1,4 @@
-import { getFirestoreDb } from "../cache/firestore";
+import { getFirestoreDb } from "../cache/firestore_old";
 import { generateEmbedding } from "./embeddings";
 import { FieldValue } from "firebase-admin/firestore";
 
